@@ -234,6 +234,9 @@ class Parser
             $this->parseWith($with);
         }
 
+        $this->meta[] = new CountMetaProvider('Meta-Total-Count', $this->originalQuery);
+        $this->meta[] = new CountMetaProvider('Meta-Filter-Count', $this->query);
+        
         //Parse the config params
         if ($config = $this->getParam('config')) {
             $this->parseConfig($config);
