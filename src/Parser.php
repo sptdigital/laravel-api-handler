@@ -84,7 +84,7 @@ class Parser
      *
      * @var array
      */
-    protected $functions = ['fields', 'sort', 'limit', 'offset', 'config', 'with', 'q'];
+    protected $functions = ['fields', 'sort', 'limit', 'offset', 'config', 'with', 'q', 'pageNumber'];
 
     /**
      * All functional params
