@@ -331,7 +331,7 @@ class Parser
     protected function parseWith($withParam)
     {
         $fields = $this->query->columns;
-        $fieldsCount = count($fields);
+        $fieldsCount = count($fields ?: []);
         $baseModel = $this->builder->getModel();
 
         $withHistory = [];
@@ -394,7 +394,10 @@ class Parser
                     $firstKey = $relation->getQualifiedParentKeyName();
                     $secondKey = $relation->getRelated()->getQualifiedKeyName();
                 } else if ($relationType === 'HasManyThrough') {
-                    if (method_exists($relation, 'getExistenceCompareKey')) {
+                    if (method_exists($relation, 'getQualifiedLocalKeyName')) {
+                        $firstKey = $relation->getQualifiedLocalKeyName();
+                    } else if (method_exists($relation, 'getExistenceCompareKey')) {
+                        // compatibility for laravel 5.4
                         $firstKey = $relation->getExistenceCompareKey();
                     } else {
                         // compatibility for laravel < 5.4
@@ -452,7 +455,7 @@ class Parser
         $this->builder->with($withsArr);
 
         //Merge the base fields
-        if (count($fields) > 0) {
+        if (count($fields ?: []) > 0) {
             if (!is_array($this->query->columns)) {
                 $this->query->columns = [];
             }
@@ -652,9 +655,9 @@ class Parser
                 }
             } else if ($cat == 'meta') {
                 if ($option == 'total-count') {
-                    $this->meta[] = new CountMetaProvider('Meta-Total-Count', $this->originalQuery);
+                    $this->meta[] = new CountMetaProvider('Meta-Total-Count', $this->originalBuilder);
                 } else if ($option == 'filter-count') {
-                    $this->meta[] = new CountMetaProvider('Meta-Filter-Count', $this->query);
+                    $this->meta[] = new CountMetaProvider('Meta-Filter-Count', $this->builder);
                 }
             } else if ($cat == 'response') {
                 if ($option == 'envelope') {
